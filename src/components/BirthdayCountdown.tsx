@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, useSyncExternalStore } from "react";
 import { BIRTHDAY_CONFIG } from "@/config/birthdayData";
 import { Clock, PartyPopper, Sparkles, CheckCircle2 } from "lucide-react";
+import { BirthdayFireworks } from "./BirthdayFireworks";
 
 type PreviewMode = "live" | "before" | "special_day" | "after";
 
@@ -22,6 +23,7 @@ export const BirthdayCountdown: React.FC = () => {
 
   const [currentTime, setCurrentTime] = useState<number | null>(null);
   const [previewMode, setPreviewMode] = useState<PreviewMode>("live");
+  const [showFireworks, setShowFireworks] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -86,6 +88,9 @@ export const BirthdayCountdown: React.FC = () => {
 
   return (
     <section id="countdown" className="relative py-20 px-4 sm:px-6">
+      {/* Celebration Fireworks when birthday midnight arrives */}
+      <BirthdayFireworks active={mounted && status === "special_day" && showFireworks} />
+
       {/* Subtle section border accent */}
       <div className="max-w-5xl mx-auto">
         {/* Section Header */}
@@ -172,13 +177,22 @@ export const BirthdayCountdown: React.FC = () => {
             <p className="text-[#B8B2C2] text-sm sm:text-base leading-relaxed max-w-lg mx-auto mb-6">
               Hari ini adalah harimu. Buka kado kejutan dan baca untaian doa yang telah disiapkan khusus untuk menyambut umur barumu.
             </p>
-            <a
-              href="#surprise"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#FF6B9E] text-[#131118] font-semibold text-sm hover:bg-[#ff528d] transition-colors shadow-lg"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>Buka Kejutan Sekarang</span>
-            </a>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a
+                href="#surprise"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#FF6B9E] text-[#131118] font-semibold text-sm hover:bg-[#ff528d] transition-colors shadow-lg"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>Buka Kejutan Sekarang</span>
+              </a>
+
+              <button
+                onClick={() => setShowFireworks(!showFireworks)}
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#25202E] text-[#B8B2C2] hover:text-[#FF6B9E] text-xs font-medium border border-[rgba(255,107,158,0.25)] hover:border-[#FF6B9E]/50 transition-colors"
+              >
+                <span>{showFireworks ? "🎆 Kembang Api: Nyala" : "🎆 Nyalakan Kembang Api"}</span>
+              </button>
+            </div>
           </div>
         ) : (
           /* Post Birthday State */
