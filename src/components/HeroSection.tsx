@@ -49,8 +49,6 @@ export const HeroSection: React.FC = () => {
         <div className="inline-flex items-center gap-2 text-xs text-[#B8B2C2] tracking-wider mb-6">
           <Calendar className="w-3.5 h-3.5 text-[#FF6B9E]" />
           <span className="font-medium">{BIRTHDAY_CONFIG.hero.dateTag}</span>
-          <span className="text-[#FF6B9E]/40">•</span>
-          <span>Asia/Jakarta</span>
         </div>
 
         {/* Main Headline */}

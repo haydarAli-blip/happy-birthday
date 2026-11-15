@@ -199,7 +199,7 @@ export const BirthdayCountdown: React.FC = () => {
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#7E778B] max-w-3xl mx-auto pt-6 border-t border-[#1C1923]">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#FF6B9E]" />
-            <span>Target: 16 November 2026, 00.00 WIB (Asia/Jakarta)</span>
+            <span>Target: 16 November 2026</span>
           </div>
 
           {/* Interactive preview toggle to test and demonstrate all states */}
