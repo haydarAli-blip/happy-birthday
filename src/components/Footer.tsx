@@ -1,53 +1,34 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
-import { birthdayConfig } from "@/lib/config";
-import { Heart } from "lucide-react";
+import React from "react";
+import { BIRTHDAY_CONFIG } from "@/config/birthdayData";
+import { Heart, Sparkles } from "lucide-react";
 
-export default function Footer() {
-  const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.5 });
-
+export const Footer: React.FC = () => {
   return (
-    <footer
-      ref={ref}
-      className="py-20 sm:py-28 relative"
-    >
-      {/* Subtle separator */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-border-rose to-transparent" />
+    <footer className="relative bg-[#100E14] border-t border-[rgba(255,107,158,0.15)] py-12 px-4 sm:px-6 text-center text-xs text-[#7E778B]">
+      <div className="max-w-4xl mx-auto flex flex-col items-center gap-4">
+        {/* Monogram */}
+        <div className="flex items-center gap-2 text-[#FF6B9E]">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span className="font-display text-sm tracking-widest text-[#F8FAFC]">
+            {BIRTHDAY_CONFIG.recipientName}
+          </span>
+          <span className="text-[#FF6B9E]">✦</span>
+          <span>16 November 2026</span>
+        </div>
 
-      <div className="max-w-lg mx-auto px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-        >
-          {/* Closing message */}
-          <p className="font-display text-xl sm:text-2xl text-text-primary leading-relaxed mb-4">
-            Happy Birthday once again,
-            <br />
-            <span className="text-pink">{birthdayConfig.name}</span>.
-          </p>
-          <p className="text-sm text-text-secondary/60 mb-8">
-            Wishing you nothing but the best. Always.
-          </p>
+        <p className="text-xs text-[#B8B2C2] max-w-md">
+          A dedicated birthday tribute crafted with warm thoughts, cherished memories, and heartfelt prayers.
+        </p>
 
-          {/* Heart icon */}
-          <Heart
-            size={18}
-            className="mx-auto text-pink/40 fill-pink/20"
-          />
-        </motion.div>
-
-        {/* Bottom bar */}
-        <div className="mt-16 pt-6 border-t border-border-subtle">
-          <p className="text-xs text-text-secondary/30 tracking-wide">
-            Made with care, just for you ✦ {new Date().getFullYear()}
-          </p>
+        <div className="flex items-center gap-1.5 text-[11px] text-[#7E778B] pt-2">
+          <span>Made with</span>
+          <Heart className="w-3.5 h-3.5 text-[#FF6B9E] fill-[#FF6B9E]" />
+          <span>for a special friend&apos;s special day</span>
         </div>
       </div>
     </footer>
   );
-}
+};
 

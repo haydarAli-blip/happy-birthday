@@ -1,246 +1,192 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
-import { birthdayConfig } from "@/lib/config";
-import { X, ImageIcon } from "lucide-react";
-import Image from "next/image";
+import React, { useState } from "react";
+import { BIRTHDAY_CONFIG, MemoryItem } from "@/config/birthdayData";
+import { Lightbox } from "./Lightbox";
+import { Camera, Expand, Sparkles, Tag } from "lucide-react";
 
-interface LightboxState {
-  isOpen: boolean;
-  index: number;
-}
+export const MemoryGallery: React.FC = () => {
+  const [selectedMemoryIndex, setSelectedMemoryIndex] = useState<number | null>(null);
 
-function PhotoPlaceholder({ aspect }: { aspect: string }) {
-  const aspectClass =
-    aspect === "portrait"
-      ? "aspect-[3/4]"
-      : aspect === "landscape"
-      ? "aspect-[4/3]"
-      : "aspect-square";
+  const memories = BIRTHDAY_CONFIG.memories;
+
+  const handleOpen = (index: number) => {
+    setSelectedMemoryIndex(index);
+  };
+
+  const handleClose = () => {
+    setSelectedMemoryIndex(null);
+  };
+
+  const handlePrev = () => {
+    if (selectedMemoryIndex !== null) {
+      setSelectedMemoryIndex((selectedMemoryIndex - 1 + memories.length) % memories.length);
+    }
+  };
+
+  const handleNext = () => {
+    if (selectedMemoryIndex !== null) {
+      setSelectedMemoryIndex((selectedMemoryIndex + 1) % memories.length);
+    }
+  };
+
+  // Aesthetic placeholder artwork generator for memory slots
+  const renderPlaceholderVisual = (item: MemoryItem, index: number) => {
+    const gradients = [
+      "from-[#2B1B26] via-[#1F1728] to-[#141219]",
+      "from-[#241A2E] via-[#2A1E29] to-[#15121B]",
+      "from-[#2D1D24] via-[#1E1925] to-[#131118]",
+      "from-[#221B2B] via-[#281822] to-[#16131D]",
+      "from-[#2C1C29] via-[#1E1826] to-[#14121A]",
+    ];
+    const gradient = gradients[index % gradients.length];
+
+    return (
+      <div
+        className={`w-full h-full min-h-[220px] bg-gradient-to-br ${gradient} p-6 flex flex-col justify-between relative overflow-hidden transition-transform duration-500 group-hover:scale-105`}
+      >
+        {/* Subtle decorative background rings */}
+        <div
+          className="absolute -right-8 -top-8 w-32 h-32 rounded-full border border-[rgba(255,107,158,0.1)] pointer-events-none"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute -left-10 -bottom-10 w-40 h-40 rounded-full border border-[rgba(167,139,250,0.08)] pointer-events-none"
+          aria-hidden="true"
+        />
+
+        {/* Top category chip */}
+        <div className="relative z-10 flex items-center justify-between">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#131118]/70 backdrop-blur-sm border border-[rgba(255,107,158,0.2)] text-[10px] uppercase tracking-wider text-[#FF6B9E] font-medium">
+            <Tag className="w-2.5 h-2.5" />
+            <span>{item.category}</span>
+          </span>
+          <span className="text-xs text-[#7E778B] font-mono">0{index + 1}</span>
+        </div>
+
+        {/* Center icon / aesthetic */}
+        <div className="relative z-10 my-4 text-center">
+          <div className="w-12 h-12 rounded-full bg-[#1C1923]/60 border border-[rgba(255,107,158,0.18)] flex items-center justify-center mx-auto text-[#FF6B9E]/80 group-hover:text-[#FF6B9E] group-hover:scale-110 transition-all">
+            <Camera className="w-5 h-5" />
+          </div>
+          <span className="block mt-2 font-display text-sm text-[#F8FAFC]/90">
+            {item.title}
+          </span>
+        </div>
+
+        {/* Bottom date */}
+        <div className="relative z-10 text-right">
+          <span className="text-[11px] text-[#B8B2C2]/70 font-mono tracking-wider">
+            {item.date}
+          </span>
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div
-      className={`${aspectClass} bg-bg-secondary/80 rounded-lg flex flex-col items-center justify-center gap-3 border border-border-subtle`}
-    >
-      <ImageIcon size={28} className="text-text-secondary/30" />
-      <span className="text-xs text-text-secondary/40 tracking-wide">
-        Add photo
-      </span>
-    </div>
-  );
-}
-
-export default function MemoryGallery() {
-  const [lightbox, setLightbox] = useState<LightboxState>({
-    isOpen: false,
-    index: 0,
-  });
-  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
-  const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.1 });
-
-  const photos = birthdayConfig.memories.photos;
-
-  const openLightbox = (index: number) => {
-    setLightbox({ isOpen: true, index });
-    document.body.style.overflow = "hidden";
-  };
-
-  const closeLightbox = useCallback(() => {
-    setLightbox((prev) => ({ ...prev, isOpen: false }));
-    document.body.style.overflow = "";
-  }, []);
-
-  const navigateLightbox = useCallback(
-    (direction: number) => {
-      setLightbox((prev) => ({
-        ...prev,
-        index: (prev.index + direction + photos.length) % photos.length,
-      }));
-    },
-    [photos.length]
-  );
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "Escape") closeLightbox();
-      if (e.key === "ArrowLeft") navigateLightbox(-1);
-      if (e.key === "ArrowRight") navigateLightbox(1);
-    },
-    [closeLightbox, navigateLightbox]
-  );
-
-  const handleImageLoad = (id: number) => {
-    setLoadedImages((prev) => new Set(prev).add(id));
-  };
-
-  const handleImageError = (id: number) => {
-    // Image failed to load - don't add to loaded set
-    // The placeholder will show instead
-  };
-
-  return (
-    <section id="memories" ref={ref} className="py-24 sm:py-32 relative">
-      {/* Subtle separator */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-border-rose to-transparent" />
-
-      <div className="max-w-4xl mx-auto px-6">
-        {/* Section heading */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="mb-14"
-        >
-          <p className="text-xs tracking-[0.25em] text-text-secondary/70 uppercase mb-3">
-            Our Memories
-          </p>
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary">
-            {birthdayConfig.memories.title}
+    <section id="memories" className="relative py-20 px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Section Header */}
+        <div className="text-center max-w-xl mx-auto mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1C1923] border border-[rgba(255,107,158,0.22)] text-[#FF6B9E] text-xs tracking-wider uppercase mb-3">
+            <Sparkles className="w-3.5 h-3.5 text-[#FF6B9E]" />
+            <span>Cherished Archive</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-display font-medium text-[#F8FAFC] tracking-tight mb-3">
+            Little Moments, Big Memories
           </h2>
-        </motion.div>
+          <p className="text-sm sm:text-base text-[#B8B2C2] leading-relaxed">
+            Kumpulan potret dan cuplikan waktu yang mengabadikan tawa, cerita, dan kebersamaan yang hangat.
+          </p>
+        </div>
 
-        {/* Editorial photo grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {photos.map((photo, index) => {
-            const isLoaded = loadedImages.has(photo.id);
-            // Vary sizes for editorial feel
-            const spanClass =
-              index === 0
-                ? "sm:col-span-2 lg:col-span-2"
-                : index === 3
-                ? "sm:col-span-2 lg:col-span-1"
-                : "";
+        {/* Editorial Asymmetrical Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-6">
+          {memories.map((item, index) => {
+            // Asymmetrical spans for editorial feel:
+            // 0: md:col-span-7 (Featured)
+            // 1: md:col-span-5
+            // 2: md:col-span-4
+            // 3: md:col-span-4
+            // 4: md:col-span-4
+            let colSpan = "md:col-span-4";
+            if (index === 0) colSpan = "md:col-span-7";
+            if (index === 1) colSpan = "md:col-span-5";
 
             return (
-              <motion.div
-                key={photo.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.1 * index }}
-                className={`group cursor-pointer ${spanClass}`}
-                onClick={() => isLoaded && openLightbox(index)}
+              <div
+                key={item.id}
+                onClick={() => handleOpen(index)}
+                className={`group relative bg-[#1C1923] rounded-2xl overflow-hidden border border-[rgba(255,107,158,0.22)] shadow-[0_4px_24px_rgba(0,0,0,0.3)] hover:border-[#FF6B9E]/60 transition-all duration-300 cursor-pointer flex flex-col justify-between ${colSpan}`}
                 role="button"
                 tabIndex={0}
-                aria-label={`View photo: ${photo.caption}`}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-                    if (isLoaded) openLightbox(index);
+                    handleOpen(index);
                   }
                 }}
+                aria-label={`Buka memori: ${item.title}`}
               >
-                <div className="relative overflow-hidden rounded-lg">
-                  {!isLoaded && <PhotoPlaceholder aspect={photo.aspect} />}
-                  <div className={isLoaded ? "block" : "hidden"}>
-                    <div
-                      className={`relative ${
-                        photo.aspect === "portrait"
-                          ? "aspect-[3/4]"
-                          : photo.aspect === "landscape"
-                          ? "aspect-[4/3]"
-                          : "aspect-square"
-                      }`}
-                    >
-                      <Image
-                        src={photo.src}
-                        alt={photo.caption}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                        onLoad={() => handleImageLoad(photo.id)}
-                        onError={() => handleImageError(photo.id)}
-                      />
-                      {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-bg-primary/0 group-hover:bg-bg-primary/30 transition-colors duration-300" />
-                    </div>
+                {/* Visual Image / Placeholder */}
+                <div className="relative overflow-hidden w-full h-56 sm:h-64">
+                  {item.imageSrc ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={item.imageSrc}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    renderPlaceholderVisual(item, index)
+                  )}
+
+                  {/* Hover overlay hint */}
+                  <div className="absolute inset-0 bg-[#131118]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1C1923]/90 text-xs text-[#F8FAFC] border border-[rgba(255,107,158,0.4)] shadow-lg">
+                      <Expand className="w-3.5 h-3.5 text-[#FF6B9E]" />
+                      <span>Lihat Foto</span>
+                    </span>
                   </div>
                 </div>
-                {/* Caption */}
-                <p className="mt-3 text-sm text-text-secondary/70 leading-relaxed">
-                  {photo.caption}
-                </p>
-              </motion.div>
+
+                {/* Editorial Caption Card */}
+                <div className="p-5 sm:p-6 bg-[#1C1923] border-t border-[#25202E]">
+                  <div className="flex items-center justify-between text-xs text-[#B8B2C2] mb-1.5">
+                    <span className="text-[#FF6B9E] font-medium">{item.category}</span>
+                    <span className="text-[11px] text-[#7E778B]">{item.date}</span>
+                  </div>
+                  <h3 className="font-display font-medium text-base sm:text-lg text-[#F8FAFC] mb-2 group-hover:text-[#FF6B9E] transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[#B8B2C2] leading-relaxed line-clamp-2">
+                    {item.caption}
+                  </p>
+                </div>
+              </div>
             );
           })}
         </div>
+
+        {/* Note on how to customize photos */}
+        <p className="text-center text-xs text-[#7E778B] mt-8">
+          ✦ Foto dapat diganti dengan menambahkan file ke folder <code className="text-[#FF6B9E]/80">public/images/</code> atau melalui konfigurasi <code className="text-[#FF6B9E]/80">birthdayData.ts</code>.
+        </p>
       </div>
 
-      {/* Lightbox */}
-      <AnimatePresence>
-        {lightbox.isOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="lightbox-overlay"
-            onClick={closeLightbox}
-            onKeyDown={handleKeyDown}
-            tabIndex={0}
-            role="dialog"
-            aria-label="Photo lightbox"
-            aria-modal="true"
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="relative max-w-4xl max-h-[85vh] mx-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Image
-                src={photos[lightbox.index].src}
-                alt={photos[lightbox.index].caption}
-                width={1200}
-                height={800}
-                className="max-h-[80vh] w-auto h-auto rounded-lg object-contain"
-              />
-              <p className="mt-4 text-center text-sm text-text-secondary">
-                {photos[lightbox.index].caption}
-              </p>
-
-              {/* Close button */}
-              <button
-                onClick={closeLightbox}
-                className="absolute -top-12 right-0 text-text-secondary hover:text-text-primary transition-colors p-2"
-                aria-label="Close lightbox"
-              >
-                <X size={20} />
-              </button>
-
-              {/* Navigation arrows */}
-              {photos.length > 1 && (
-                <>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigateLightbox(-1);
-                    }}
-                    className="absolute top-1/2 -translate-y-1/2 -left-12 sm:-left-14 text-text-secondary hover:text-text-primary transition-colors p-2 text-2xl"
-                    aria-label="Previous photo"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigateLightbox(1);
-                    }}
-                    className="absolute top-1/2 -translate-y-1/2 -right-12 sm:-right-14 text-text-secondary hover:text-text-primary transition-colors p-2 text-2xl"
-                    aria-label="Next photo"
-                  >
-                    ›
-                  </button>
-                </>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Lightbox Modal */}
+      {selectedMemoryIndex !== null && (
+        <Lightbox
+          memory={memories[selectedMemoryIndex]}
+          currentIndex={selectedMemoryIndex}
+          total={memories.length}
+          onClose={handleClose}
+          onPrev={handlePrev}
+          onNext={handleNext}
+        />
+      )}
     </section>
   );
-}
+};
 

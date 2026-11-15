@@ -1,36 +1,37 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-const playfair = Playfair_Display({
+const playfairDisplay = Playfair_Display({
   variable: "--font-display",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
+  style: ["normal", "italic"],
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-body",
   subsets: ["latin"],
   display: "swap",
   weight: ["400", "500", "600", "700"],
 });
 
-const inter = Inter({
-  variable: "--font-body",
-  subsets: ["latin"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
-  title: "Happy Birthday, Najwa Mizu Abhita! 🎂",
-  description:
-    "A little birthday surprise made with love. Happy birthday!",
-  icons: {
-    icon: "/favicon.ico",
-  },
+  title: "Happy Birthday, Najwa! ✦ 16 November 2026",
+  description: "A special birthday greeting and memorable experience crafted with care.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html
-      lang="en"
-      className={`${playfair.variable} ${inter.variable} antialiased`}
-    >
-      <body className="min-h-screen">{children}</body>
+    <html lang="id" className={`${playfairDisplay.variable} ${plusJakartaSans.variable} scroll-smooth`}>
+      <body className="min-h-screen bg-[#131118] text-[#F8FAFC] antialiased selection:bg-[#FF6B9E]/30 selection:text-white">
+        {children}
+      </body>
     </html>
   );
 }
