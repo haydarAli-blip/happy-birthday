@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useSyncExternalStore } from "react";
 import { BIRTHDAY_CONFIG } from "@/config/birthdayData";
-import { Clock, PartyPopper, Sparkles, CheckCircle2, Heart, Expand, X, Camera } from "lucide-react";
+import { Clock, PartyPopper, Sparkles, CheckCircle2, Expand, X, Camera } from "lucide-react";
 import { BirthdayFireworks } from "./BirthdayFireworks";
 
 type PreviewMode = "live" | "before" | "special_day" | "after";
@@ -272,9 +272,8 @@ export const BirthdayCountdown: React.FC = () => {
 
                 {/* Photo Caption Box */}
                 <div className="pt-4 pb-1 px-2 text-center">
-                  <h4 className="font-display font-medium text-base sm:text-lg text-[#F8FAFC] flex items-center justify-center gap-2">
-                    <span>{photoConfig.captionTitle}</span>
-                    <Heart className="w-3.5 h-3.5 text-[#FF6B9E] fill-[#FF6B9E]" />
+                  <h4 className="font-display font-medium text-base sm:text-lg text-[#F8FAFC]">
+                    {photoConfig.captionTitle}
                   </h4>
                   <p className="text-xs text-[#B8B2C2] mt-1 font-normal leading-relaxed">
                     {photoConfig.captionSubtitle}
