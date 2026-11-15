@@ -165,10 +165,10 @@ export const BIRTHDAY_CONFIG = {
 
   // Audio / Music Player
   music: {
-    title: "Gentle Rose Reverie",
-    artist: "Acoustic Ambient Harmony",
-    defaultVolume: 0.5,
-    customAudioSrc: "", // Can be a local or URL audio file; fallback synthesizer provided
+    title: "Special Birthday Song",
+    artist: "For Najwa",
+    defaultVolume: 0.7,
+    customAudioSrc: "/music/lagu.mp3", // File lagu yang Anda masukkan
   },
 
   // Featured Portrait Photo (between Hero and Countdown)
