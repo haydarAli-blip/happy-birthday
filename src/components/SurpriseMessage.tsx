@@ -122,7 +122,7 @@ export const SurpriseMessage: React.FC = () => {
                   <p className="font-display text-lg text-[#FF6B9E] mb-3">
                     {surprise.letterHead}
                   </p>
-                  <p className="text-sm sm:text-base text-[#F8FAFC] leading-relaxed font-normal mb-4">
+                  <p className="text-sm sm:text-base text-[#F8FAFC] leading-relaxed font-normal mb-4 whitespace-pre-line">
                     {surprise.letterBody}
                   </p>
                   <p className="text-xs italic text-[#A78BFA]">
